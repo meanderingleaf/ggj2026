@@ -7,6 +7,11 @@
     <!--  <script src="https://cdn.jsdelivr.net/npm/quickdraw.js@1.0.6/src/quickdraw.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"> </script>
 
+    <script src="libs/riffwave.js"></script>
+    <script src="libs/Blob.js"></script>
+    <script src="libs/FileSaver.min.js"></script>
+    <script src="libs/animalese.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -62,6 +67,27 @@
     let model;
     let video;
     let detectionData = [];
+    let synth;
+
+        function dataURItoBlob(dataURI) {
+            // convert base64/URLEncoded data component to raw binary data held in a string
+            var byteString;
+            if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                byteString = atob(dataURI.split(',')[1]);
+            else
+                byteString = unescape(dataURI.split(',')[1]);
+
+            // separate out the mime component
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+            // write the bytes of the string to a typed array
+            var ia = new Uint8Array(byteString.length);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ia], {type:mimeString});
+            }
 
     // Initialize webcam and model
     async function init() {
@@ -84,6 +110,12 @@
         
         // Start continuous detection
         detectObjects();
+
+
+
+        synth = new Animalese('libs/animalese.wav', function() {
+            console.log("Animalese model loaded.");
+        });
     }
 
     // Continuous object detection
@@ -154,6 +186,7 @@
         txtDialog;
         player_velocity = -1;
         player;
+        portraits = [];
 
         preload ()
         {
@@ -168,7 +201,7 @@
         update() {
             this.player.y += this.player_velocity;
 
-            if(this.player.y < this.progress_points[this.progress]) {
+            if(this.player.y < this.progress_points[this.progress] && !this.progress_checking) {
                 //pause
                 this.player_velocity = 0;
 
@@ -176,6 +209,11 @@
 
                 //show dialog
                 this.txtDialog.setText(this.progress_prompts[this.progress]);
+                this.portraits[this.progress].visible = true;
+
+                var audio = new Audio();
+                audio.src = synth.Animalese(this.progress_prompts[this.progress], false, 1).dataURI;
+                audio.play();
                 
                 //wait for next progress
                 this.progress_checking = true;
@@ -188,6 +226,7 @@
                     let detected_class = detectionData[i].className.toLowerCase();
                     if(detected_class.includes(this.correct_responses[this.progress])) {
                         //correct object detected
+                        this.portraits[this.progress].visible = false;
                         this.progress++;
                         this.txtDialog.setText("Great! Keep going!");
                         this.progress_checking = false;
@@ -213,6 +252,28 @@
            this.txtDialog.setScrollFactor(0);
 
            this.player = this.add.sprite(270, 800, 'brawler');
+
+            //enconters - small sprites
+            this.add.image(200, 0, 'logo');
+            this.add.image(200, 60, 'logo');
+            this.add.image(200, -100, 'logo');
+            this.add.image(200, -200, 'logo');
+
+
+            //enconters - big sprites
+                //There has to be some way to make a container / loop I am being lazy right now.
+            this.portraits[0] = this.add.image(0, 600, 'logo').setScale(2);
+            this.portraits[0].setScrollFactor(0);
+            this.portraits[0].visible = false;
+            this.portraits[1] = this.add.image(0, 600, 'logo').setScale(2);
+             this.portraits[1].setScrollFactor(0);
+             this.portraits[1].visible = false;
+            this.portraits[2] = this.add.image(0, 600, 'logo').setScale(2);
+             this.portraits[2].setScrollFactor(0);
+             this.portraits[2].visible = false;
+            this.portraits[3] = this.add.image(0, 600, 'logo').setScale(2);
+             this.portraits[3].setScrollFactor(0);
+             this.portraits[3].visible = false;
 
            this.anims.create({
                 key: 'walk',
