@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2"></script>
+    <!--  <script src="https://cdn.jsdelivr.net/npm/quickdraw.js@1.0.6/src/quickdraw.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"> </script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #webcam-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #webcam {
+            border: 2px solid #333;
+            max-width: 500px;
+            display: none;
+        }
+        #classifications {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            width: 400px;
+            min-height: 100px;
+            overflow-y: hidden
+        }
+        .detection-item {
+            padding: 5px;
+            margin: 3px 0;
+            background: white;
+            border-left: 4px solid #4CAF50;
+            border-radius: 3px;
+            height: 1em;
+            overflow: hidden;
+        }
+        #game-container {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <div id="webcam-container">
+        <h2>Webcam Object Detection</h2>
+        <video id="webcam" autoplay playsinline></video>
+        <div id="classifications">
+            <p>Loading model...</p>
+        </div>
+    </div>
+    
+
+    <script>
+    let model;
+    let video;
+    let detectionData = [];
+
+    // Initialize webcam and model
+    async function init() {
+        video = document.getElementById('webcam');
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 500, height: 500 }
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            console.error('Error accessing webcam:', err);
+            document.getElementById('classifications').innerHTML = 'Error: Cannot access webcam. Please check permissions.';
+            return;
+        }
+
+        // Load the COCO-SSD model
+        model = await mobilenet.load(); //cocoSsd.load();
+        document.getElementById('classifications').innerHTML = 'Model loaded! Starting detection...';
+        
+        // Start continuous detection
+        detectObjects();
+    }
+
+    // Continuous object detection
+    async function detectObjects() {
+        /*
+        //Coco-SSD detection
+        if (model && video.readyState === video.HAVE_ENOUGH_DATA) {
+            const predictions = await model.detect(video);
+            updateDetections(predictions);
+        }
+            */
+
+        //MobileNet classification
+        if (model && video.readyState === video.HAVE_ENOUGH_DATA) {
+            const predictions = await model.classify(video);
+            updateDetections(predictions);
+        }
+        requestAnimationFrame(detectObjects);
+    }
+
+    // Update the UI with detections
+    function updateDetections(predictions) {
+
+        detectionData = predictions;
+        
+        if (predictions.length === 0) {
+            document.getElementById('classifications').innerHTML = '<p>No objects detected</p>';
+            return;
+        }
+
+
+        //codo-SSD display
+        /*
+        let html = `<strong>Detected ${predictions.length} object(s):</strong><br>`;
+        predictions.forEach(pred => {
+            const confidence = (pred.score * 100).toFixed(1);
+            html += `<div class="detection-item">
+                <strong>${pred.class}</strong> - ${confidence}% confident
+            </div>`;
+        });
+        */
+
+        //MobileNet display
+         let html = `<strong>Detected ${predictions.length} object(s):</strong><br>`;
+         predictions.forEach(pred => {
+            const confidence = (pred.probability * 100).toFixed(1);
+            html += `<div class="detection-item">
+                <strong>${pred.className}</strong> - ${confidence}% confident
+            </div>`;
+        });
+
+        document.getElementById('classifications').innerHTML = html;
+    }
+
+    // Phaser scene
+    class Example extends Phaser.Scene
+    {
+        progress = 0;
+        progress_checking = false;
+        progress_points = [20, -100, -150, -200];
+        progress_prompts = [
+            "I see a cat! Meow!",
+            "There's a bottle ahead!",
+            "Is that a cell phone?",
+            "Look, a book!"
+        ];
+        correct_responses = [ "oxygen mask", "bottle", "cell phone", "book" ];
+        txtDialog;
+        player_velocity = -1;
+        player;
+
+        preload ()
+        {
+            this.load.setBaseURL('https://labs.phaser.io');
+            this.load.image('sky', 'assets/skies/space3.png');
+            this.load.image('logo', 'assets/sprites/phaser3-logo.png');
+            this.load.image('red', 'assets/particles/red.png');
+            this.load.spritesheet('brawler', 'assets/animations/brawler48x48.png', { frameWidth: 48, frameHeight: 48 });
+
+        }
+        
+        update() {
+            this.player.y += this.player_velocity;
+
+            if(this.player.y < this.progress_points[this.progress]) {
+                //pause
+                this.player_velocity = 0;
+
+                //stop walking
+
+                //show dialog
+                this.txtDialog.setText(this.progress_prompts[this.progress]);
+                
+                //wait for next progress
+                this.progress_checking = true;
+            }
+
+            if(this.progress_checking) {
+                //check detectionData for correct object
+                for(let i=0; i<detectionData.length; i++) {
+
+                    let detected_class = detectionData[i].className.toLowerCase();
+                    if(detected_class.includes(this.correct_responses[this.progress])) {
+                        //correct object detected
+                        this.progress++;
+                        this.txtDialog.setText("Great! Keep going!");
+                        this.progress_checking = false;
+                        setTimeout( () => {
+                            this.player_velocity = -1;
+                            this.player.play('walk');
+                            this.txtDialog.setText("");
+                        }, 2000);
+                        break;
+                    }
+                }
+            }
+
+            //this.progress++;
+        }
+
+        create ()
+        {
+
+           this.add.image(400, 300, 'sky');
+
+           this.txtDialog = this.add.text(100, 800, 'Hello World', { fontFamily: 'Arial, sans-serif' });
+           this.txtDialog.setScrollFactor(0);
+
+           this.player = this.add.sprite(270, 800, 'brawler');
+
+           this.anims.create({
+                key: 'walk',
+                frames: this.anims.generateFrameNumbers('brawler', { frames: [ 0, 1, 2, 3 ] }),
+                frameRate: 8,
+                repeat: -1
+            });
+
+            this.player.play('walk');
+            this.cameras.main.startFollow(this.player);
+
+            /*
+            this.add.image(400, 300, 'sky');
+
+            const particles = this.add.particles(0, 0, 'red', {
+                speed: 100,
+                scale: { start: 1, end: 0 },
+                blendMode: 'ADD'
+            });
+
+            const logo = this.physics.add.image(400, 100, 'logo');
+
+            logo.setVelocity(100, 200);
+            logo.setBounce(1, 1);
+            logo.setCollideWorldBounds(true);
+
+            particles.startFollow(logo);
+            */
+        }
+    }
+
+    const config = {
+        type: Phaser.AUTO,
+        width: 540,
+        height: 960,
+        parent: 'game-container',
+        scene: Example,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 200 }
+            }
+        }
+    };
+
+    const game = new Phaser.Game(config);
+
+    // Start webcam and model when page loads
+    window.addEventListener('load', init);
+    </script>
+
+</body>
+</html>
