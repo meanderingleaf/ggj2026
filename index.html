@@ -216,10 +216,10 @@
             this.load.spritesheet('por_cons', 'assets/cons_paper_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
             this.load.spritesheet('por_person', 'assets/person_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
 
-            this.load.spritesheet('claysprite', 'assets/Claysprite.png', { frameWidth: 1024, frameWidth: 1024 });
-            this.load.spritesheet('mcsprite', 'assets/Maincharactersprite.png', { frameWidth: 1024, frameWidth: 1024 });
-            this.load.spritesheet('dollsprite', 'assets/Papergirlsprite.png', { frameWidth: 1024, frameWidth: 1024 });
-            this.load.spritesheet('personsprite', 'assets/Papergirlsprite.png', { frameWidth: 1024, frameWidth: 1024 });
+            this.load.spritesheet('claysprite', 'assets/Claysprite.png', { frameWidth: 500, frameWidth: 500 });
+            this.load.spritesheet('mcsprite', 'assets/Maincharactersprite.png', { frameWidth: 500, frameHeight: 500 });
+            this.load.spritesheet('dollsprite', 'assets/Papergirlsprite.png', { frameWidth: 500, frameHeight: 500 });
+            this.load.spritesheet('personsprite', 'assets/Papergirlsprite.png', { frameWidth: 500, frameHeight: 500 });
             //this.load.setBaseURL('https://meanderingleaf.github.io/ggj2026/');
             
         }
@@ -340,10 +340,10 @@
 
             //enconters - small sprites
             var glitches = []
-            glitches[0] = this.add.sprite(200, this.progress_points[0], 'psprite').setScale(2);
-            glitches[1] = this.add.sprite(200, this.progress_points[1], 'psprite').setScale(2);
-            glitches[2] = this.add.sprite(200, this.progress_points[2], 'psprite').setScale(2);
-            glitches[3] = this.add.sprite(200, this.progress_points[3], 'psprite').setScale(2);
+            glitches[0] = this.add.sprite(200, this.progress_points[0], 'dollsprite').setScale(.5);
+            glitches[1] = this.add.sprite(200, this.progress_points[1], 'claysprite').setScale(.5);
+            glitches[2] = this.add.sprite(200, this.progress_points[2], 'personsprite').setScale(.5);
+            glitches[3] = this.add.sprite(200, this.progress_points[3], 'personsprite').setScale(.5);
 
             //enconters - big sprites
                 //There has to be some way to make a container / loop I am being lazy right now.
@@ -392,15 +392,32 @@
             this.portraits[1].play('idle_cons');
 
             this.anims.create({
-                key: 'guard_idle',
-                frames: this.anims.generateFrameNumbers('psprite', { frames: [ 0, 1, 2 ] }),
+                key: 'doll_idle',
+                frames: [ 0, 1, 2 ],
+                frames: this.anims.generateFrameNumbers('dollsprite', { frames: [ 0, 1, 2 ] }),
                 frameRate: 2,
                 repeat: -1
             });
+            glitches[0].play('doll_idle');
 
-            glitches.forEach( (glitch) => {
-                glitch.play('guard_idle');
+            this.anims.create({
+                key: 'clay_idle',
+                frames: [ 0, 1, 2 ],
+                frames: this.anims.generateFrameNumbers('claysprite', { frames: [ 0, 1, 2 ] }),
+                frameRate: 2,
+                repeat: -1
             });
+            glitches[1].play('clay_idle');
+
+            this.anims.create({
+                key: 'person_idle',
+                frames: [ 0, 1, 2 ],
+                frames: this.anims.generateFrameNumbers('personsprite', { frames: [ 0, 1, 2 ] }),
+                frameRate: 2,
+                repeat: -1
+            });
+            glitches[2].play('person_idle');
+            glitches[3].play('person_idle');
 
             //Intrusctions
             this.add.bitmapText(10, 600, "glitch_font", "(Sonanmbulism)");
