@@ -19,6 +19,7 @@
             display: flex;
             gap: 20px;
             font-family: Arial, sans-serif;
+            background-color: #000;
         }
         #webcam-container {
             display: flex;
@@ -175,18 +176,26 @@
     {
         progress = 0;
         progress_checking = false;
-        progress_points = [20, -100, -150, -200];
+        progress_points = [0, -600, -1200, -3000];
         progress_prompts = [
             "I see a cat! Meow!",
             "There's a bottle ahead!",
             "Is that a cell phone?",
             "Look, a book!"
         ];
-        correct_responses = [ "oxygen mask", "bottle", "cell phone", "book" ];
+        potential_responses =  { 
+            "real": "sundial", 
+            "sketchy": "mask", 
+            "hasty": "pillow"
+        };
+        correct_responses = [ this.potential_responses.sketchy, this.potential_responses.hasty, this.potential_responses.real, this.potential_responses.real ];
         txtDialog;
         player_velocity = -1;
         player;
         portraits = [];
+       
+
+        //pillow, sundial, mask
 
         preload ()
         {
@@ -259,10 +268,10 @@
            this.player = this.add.sprite(270, 800, 'brawler');
 
             //enconters - small sprites
-            this.add.sprite(200, 0, 'psprite');
-            this.add.sprite(200, 60, 'psprite');
-            this.add.sprite(200, -100, 'psprite');
-            this.add.sprite(200, -200, 'psprite');  
+            this.add.sprite(200, this.progress_points[0], 'psprite');
+            this.add.sprite(200, this.progress_points[1], 'psprite');
+            this.add.sprite(200, this.progress_points[2], 'psprite');
+            this.add.sprite(200, this.progress_points[3], 'psprite');  
 
             //enconters - big sprites
                 //There has to be some way to make a container / loop I am being lazy right now.
