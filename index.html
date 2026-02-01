@@ -207,6 +207,7 @@
             this.load.image('ico_octo', 'assets/ico_octo.png');
             this.load.image('ico_tri', 'assets/ico_tri.png');
             this.load.image('logo', 'assets/Somnabulismlogo.png');
+            this.load.image('textbox', 'assets/textbox.png');
             this.load.bitmapFont('glitch_font', 'assets/glitch_font.png', 'assets/glitch_font.xml');
 
 
@@ -234,10 +235,10 @@
                 //stop walking
 
                 //show dialog
-                this.txtDialog.setText("");
+                this.textbox.visible = true;
                 this.txtDialog.setText(this.progress_prompts[this.progress]);
                 this.portraits[this.progress].visible = true;
-                var tween = this.tweens.add({ targets: this.portraits[this.progress], y: { from: 1100, to: 750 }, ease: 'Bounce', duration: 700,});
+                var tween = this.tweens.add({ targets: this.portraits[this.progress], y: { from: 1100, to: 500 }, ease: 'Bounce', duration: 700,});
 
 
                 var audio = new Audio();
@@ -269,8 +270,8 @@
             }
 
             //game over
-            if( this.player.y <5000 ) {
-               // window.close();
+            if( this.player.y < 5000 ) {
+             //   window.close();
             }
 
             var do_progress = false;
@@ -279,7 +280,6 @@
                 for(let i=0; i<detectionData.length; i++) {
 
                     let detected_class = detectionData[i].className.toLowerCase();
-
 
                     if(detected_class.includes(this.correct_responses[this.progress])) {
                         do_progress = true;
@@ -301,6 +301,7 @@
                 this.player_velocity = -1;
                 this.player.play('walk');
                 this.txtDialog.setText("");
+                this.textbox.visible = false;
             }
 
             //nasty double loop
@@ -324,8 +325,6 @@
                 }
             }
 
-            console.log( this.QKey.isDown );
-
             //this.progress++;
         }
 
@@ -336,7 +335,7 @@
 
            this.add.image(200, 200, 'bgimage');
 
-           this.player = this.add.sprite(270, 800, 'brawler');
+           this.player = this.add.sprite(270, 800, 'mcsprite').setScale(.2);
 
             //enconters - small sprites
             var glitches = []
@@ -347,22 +346,22 @@
 
             //enconters - big sprites
                 //There has to be some way to make a container / loop I am being lazy right now.
-            this.portraits[0] = this.add.sprite(150, 600, 'por_paperdoll').setScale(.4);
+            this.portraits[0] = this.add.sprite(150, 400, 'por_paperdoll').setScale(.4);
             this.portraits[0].setScrollFactor(0);
             this.portraits[0].visible = false;
-            this.portraits[1] = this.add.sprite(150, 600, 'por_cons').setScale(.4);
+            this.portraits[1] = this.add.sprite(150, 400, 'por_cons').setScale(.4);
             this.portraits[1].setScrollFactor(0);
             this.portraits[1].visible = false;
-            this.portraits[2] = this.add.sprite(150, 600, 'por_person').setScale(.4);
+            this.portraits[2] = this.add.sprite(150, 400, 'por_person').setScale(.4);
             this.portraits[2].setScrollFactor(0);
             this.portraits[2].visible = false;
-            this.portraits[3] = this.add.sprite(150, 600, 'por_person').setScale(.4);
+            this.portraits[3] = this.add.sprite(150, 400, 'por_person').setScale(.4);
             this.portraits[3].setScrollFactor(0);
             this.portraits[3].visible = false;
 
            this.anims.create({
                 key: 'walk',
-                frames: this.anims.generateFrameNumbers('brawler', { frames: [ 0, 1, 2, 3 ] }),
+                frames: this.anims.generateFrameNumbers('mcsprite', { frames: [ 9,10,11 ] }),
                 frameRate: 8,
                 repeat: -1
             });
@@ -435,7 +434,11 @@
             this.cameras.main.startFollow(this.player);
             this.cameras.main.postFX.addTiltShift(0.13, 1.1, 0.2);
 
-            this.txtDialog = this.add.bitmapText(300, 800, 'glitch_font', '');
+            //teext
+            this.textbox = this.add.image(400, 530, 'textbox').setScrollFactor(0).setScale(.6);
+            this.textbox.visible = false;
+
+            this.txtDialog = this.add.bitmapText(300, 500, 'glitch_font', '');
             this.txtDialog.setFontSize(21);
             this.txtDialog.setScrollFactor(0);
 
