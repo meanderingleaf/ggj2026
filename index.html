@@ -178,10 +178,10 @@
         progress_checking = false;
         progress_points = [0, -600, -1200, -3000];
         progress_prompts = [
-            "I see a cat! Meow!",
-            "There's a bottle ahead!",
-            "Is that a cell phone?",
-            "Look, a book!"
+            "Have I seen you before?",
+            "Whats the password.",
+            "Make sure its right.",
+            "Put on your face."
         ];
         potential_responses =  { 
             "real": "cleaver", 
@@ -194,7 +194,7 @@
         player;
         portraits = [];
         timer_circle;
-        choice_timeout = 200;//17000;
+        choice_timeout = 17000;
         choice_sprites = [];
 
         //pillow, sundial, mask
@@ -384,10 +384,22 @@
                 glitch.play('guard_idle');
             });
 
+            //Intrusctions
+            this.add.text(10, 600, "(Sonanmbulism)", { fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, 400, "Grab your masks", { fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, 200, "Use them to pass", { fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, -3000, "Its real.", { fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, -3200, "Its always been real.",{ fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, -3400, "Discard,",{ fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, -3600, "Turn,",{ fontFamily: 'Arial, sans-serif' });
+            this.add.text(10, -4000, "Awake.", { fontFamily: 'Arial, sans-serif' });
+
+
             this.player.play('walk');
             this.cameras.main.startFollow(this.player);
+            this.cameras.main.postFX.addTiltShift(0.13, 1.1, 0.2);
 
-            this.txtDialog = this.add.text(100, 800, '', { fontFamily: 'Arial, sans-serif' });
+            this.txtDialog = this.add.text(300, 800, '', { fontFamily: 'Arial, sans-serif' });
             this.txtDialog.setScrollFactor(0);
 
             this.timer_circle = this.add.graphics();
