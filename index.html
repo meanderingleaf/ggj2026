@@ -206,7 +206,9 @@
             this.load.image('ico_wavy', 'assets/ico_wavy.png');
             this.load.image('ico_octo', 'assets/ico_octo.png');
             this.load.image('ico_tri', 'assets/ico_tri.png');
+            this.load.image('logo', 'assets/Somnabulismlogo.png');
             this.load.bitmapFont('glitch_font', 'assets/glitch_font.png', 'assets/glitch_font.xml');
+
 
             this.load.spritesheet('brawler', 'assets/brawler48x48.png', { frameWidth: 48, frameHeight: 48 });
             this.load.spritesheet('psprite', 'assets/glitch_sprite.png', { frameWidth: 32, frameHeight: 32 });
@@ -214,6 +216,10 @@
             this.load.spritesheet('por_cons', 'assets/cons_paper_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
             this.load.spritesheet('por_person', 'assets/person_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
 
+            this.load.spritesheet('claysprite', 'assets/Claysprite.png', { frameWidth: 1024, frameWidth: 1024 });
+            this.load.spritesheet('mcsprite', 'assets/Maincharactersprite.png', { frameWidth: 1024, frameWidth: 1024 });
+            this.load.spritesheet('dollsprite', 'assets/Papergirlsprite.png', { frameWidth: 1024, frameWidth: 1024 });
+            this.load.spritesheet('personsprite', 'assets/Papergirlsprite.png', { frameWidth: 1024, frameWidth: 1024 });
             //this.load.setBaseURL('https://meanderingleaf.github.io/ggj2026/');
             
         }
@@ -398,6 +404,7 @@
 
             //Intrusctions
             this.add.bitmapText(10, 600, "glitch_font", "(Sonanmbulism)");
+            this.add.image(300, 600, 'logo').setScale(0.14);
             this.add.text(10, 400, "Grab your masks", { fontFamily: 'Arial, sans-serif' });
             this.add.text(10, 200, "Use them to pass", { fontFamily: 'Arial, sans-serif' });
             this.add.text(10, -3000, "Its real.", { fontFamily: 'Arial, sans-serif' });
