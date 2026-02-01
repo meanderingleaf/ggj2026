@@ -179,14 +179,14 @@
         progress_points = [0, -600, -1200, -3000];
         progress_prompts = [
             "Have I seen you before?",
-            "Whats the password.",
+            "Time o'clock",
             "Make sure its right.",
             "Put on your face."
         ];
         potential_responses =  { 
             "real": "cleaver", 
             "sketchy": "bow tie", 
-            "hasty": "cup"
+            "hasty": "envelope"
         };
         correct_responses = [ this.potential_responses.sketchy, this.potential_responses.hasty, this.potential_responses.real, this.potential_responses.real ];
         txtDialog;
@@ -206,6 +206,7 @@
             this.load.image('ico_wavy', 'assets/ico_wavy.png');
             this.load.image('ico_octo', 'assets/ico_octo.png');
             this.load.image('ico_tri', 'assets/ico_tri.png');
+            this.load.bitmapFont('glitch_font', 'assets/glitch_font.png', 'assets/glitch_font.xml');
 
             this.load.spritesheet('brawler', 'assets/brawler48x48.png', { frameWidth: 48, frameHeight: 48 });
             this.load.spritesheet('psprite', 'assets/glitch_sprite.png', { frameWidth: 32, frameHeight: 32 });
@@ -227,6 +228,7 @@
                 //stop walking
 
                 //show dialog
+                this.txtDialog.setText("");
                 this.txtDialog.setText(this.progress_prompts[this.progress]);
                 this.portraits[this.progress].visible = true;
                 var tween = this.tweens.add({ targets: this.portraits[this.progress], y: { from: 1100, to: 750 }, ease: 'Bounce', duration: 700,});
@@ -274,13 +276,12 @@
                         //correct object detected
                         this.portraits[this.progress].visible = false;
                         this.progress++;
-                        this.txtDialog.setText("Great! Keep going!");
                         this.progress_checking = false;
-                        setTimeout( () => {
+                       // setTimeout( () => {
                             this.player_velocity = -1;
                             this.player.play('walk');
                             this.txtDialog.setText("");
-                        }, 2000);
+                      //  }, 2000);
                         break;
                     }
                 }
@@ -385,7 +386,7 @@
             });
 
             //Intrusctions
-            this.add.text(10, 600, "(Sonanmbulism)", { fontFamily: 'Arial, sans-serif' });
+            this.add.bitmapText(10, 600, "glitch_font", "(Sonanmbulism)");
             this.add.text(10, 400, "Grab your masks", { fontFamily: 'Arial, sans-serif' });
             this.add.text(10, 200, "Use them to pass", { fontFamily: 'Arial, sans-serif' });
             this.add.text(10, -3000, "Its real.", { fontFamily: 'Arial, sans-serif' });
@@ -399,7 +400,8 @@
             this.cameras.main.startFollow(this.player);
             this.cameras.main.postFX.addTiltShift(0.13, 1.1, 0.2);
 
-            this.txtDialog = this.add.text(300, 800, '', { fontFamily: 'Arial, sans-serif' });
+            this.txtDialog = this.add.bitmapText(300, 800, 'glitch_font', '');
+            this.txtDialog.setFontSize(21);
             this.txtDialog.setScrollFactor(0);
 
             this.timer_circle = this.add.graphics();
