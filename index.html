@@ -190,12 +190,16 @@
 
         preload ()
         {
-            this.load.setBaseURL('https://labs.phaser.io');
-            this.load.image('sky', 'assets/skies/space3.png');
-            this.load.image('logo', 'assets/sprites/phaser3-logo.png');
-            this.load.image('red', 'assets/particles/red.png');
-            this.load.spritesheet('brawler', 'assets/animations/brawler48x48.png', { frameWidth: 48, frameHeight: 48 });
+            this.load.audio('bgm', 'assets/mysteriousweird.mp3');
+            this.load.image('bgimage', 'assets/randomBG.png');
+            this.load.spritesheet('brawler', 'assets/brawler48x48.png', { frameWidth: 48, frameHeight: 48 });
+            this.load.spritesheet('psprite', 'assets/glitch_sprite.png', { frameWidth: 32, frameHeight: 32 });
+            this.load.spritesheet('por_paperdoll', 'assets/paper_doll_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
+            this.load.spritesheet('por_cons', 'assets/cons_paper_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
+            this.load.spritesheet('por_person', 'assets/person_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
 
+            //this.load.setBaseURL('https://meanderingleaf.github.io/ggj2026/');
+            
         }
         
         update() {
@@ -210,7 +214,7 @@
                 //show dialog
                 this.txtDialog.setText(this.progress_prompts[this.progress]);
                 this.portraits[this.progress].visible = true;
-                var tween = scene.tweens.add({ targets: this.portraits[this.progress], y: { from: 900, to: 600 }, ease: 'Bounce', duration: 700,});
+                var tween = this.tweens.add({ targets: this.portraits[this.progress], y: { from: 1100, to: 750 }, ease: 'Bounce', duration: 700,});
 
 
                 var audio = new Audio();
@@ -248,32 +252,30 @@
         create ()
         {
 
-           this.add.image(400, 300, 'sky');
+           var backgroundMusic = this.sound.play('bgm', { loop: true });;
 
-           this.txtDialog = this.add.text(100, 800, 'Hello World', { fontFamily: 'Arial, sans-serif' });
-           this.txtDialog.setScrollFactor(0);
+           this.add.image(200, 200, 'bgimage');
 
            this.player = this.add.sprite(270, 800, 'brawler');
 
             //enconters - small sprites
-            this.add.image(200, 0, 'logo');
-            this.add.image(200, 60, 'logo');
-            this.add.image(200, -100, 'logo');
-            this.add.image(200, -200, 'logo');
-
+            this.add.sprite(200, 0, 'psprite');
+            this.add.sprite(200, 60, 'psprite');
+            this.add.sprite(200, -100, 'psprite');
+            this.add.sprite(200, -200, 'psprite');  
 
             //enconters - big sprites
                 //There has to be some way to make a container / loop I am being lazy right now.
-            this.portraits[0] = this.add.image(0, 600, 'logo').setScale(2);
+            this.portraits[0] = this.add.sprite(150, 600, 'por_paperdoll').setScale(.4);
             this.portraits[0].setScrollFactor(0);
             this.portraits[0].visible = false;
-            this.portraits[1] = this.add.image(0, 600, 'logo').setScale(2);
+            this.portraits[1] = this.add.sprite(150, 600, 'por_cons').setScale(.4);
              this.portraits[1].setScrollFactor(0);
              this.portraits[1].visible = false;
-            this.portraits[2] = this.add.image(0, 600, 'logo').setScale(2);
+            this.portraits[2] = this.add.sprite(150, 600, 'por_person').setScale(.4);
              this.portraits[2].setScrollFactor(0);
              this.portraits[2].visible = false;
-            this.portraits[3] = this.add.image(0, 600, 'logo').setScale(2);
+            this.portraits[3] = this.add.sprite(150, 600, 'por_person').setScale(.4);
              this.portraits[3].setScrollFactor(0);
              this.portraits[3].visible = false;
 
@@ -284,9 +286,36 @@
                 repeat: -1
             });
 
+            this.anims.create({
+                key: 'idle_person',
+                frames: this.anims.generateFrameNumbers('por_person', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+                frameRate: 2,
+                repeat: -1
+            });
+             this.portraits[3].play('idle_person');
+
+            this.anims.create({
+                key: 'idle_doll',
+                frames: this.anims.generateFrameNumbers('por_paperdoll', { frames: [ 0, 1 ] }),
+                frameRate: 2,
+                repeat: -1
+            });
+            this.portraits[0].play('idle_doll');
+
+            this.anims.create({
+                key: 'idle_cons',
+                frames: this.anims.generateFrameNumbers('por_cons', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+                frameRate: 2,
+                repeat: -1
+            });
+             this.portraits[1].play('idle_cons');
+
 
             this.player.play('walk');
             this.cameras.main.startFollow(this.player);
+
+            this.txtDialog = this.add.text(100, 800, '', { fontFamily: 'Arial, sans-serif' });
+            this.txtDialog.setScrollFactor(0);
 
             /*
             this.add.image(400, 300, 'sky');
