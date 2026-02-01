@@ -210,6 +210,8 @@
                 //show dialog
                 this.txtDialog.setText(this.progress_prompts[this.progress]);
                 this.portraits[this.progress].visible = true;
+                var tween = scene.tweens.add({ targets: this.portraits[this.progress], y: { from: 900, to: 600 }, ease: 'Bounce', duration: 700,});
+
 
                 var audio = new Audio();
                 audio.src = synth.Animalese(this.progress_prompts[this.progress], false, 1).dataURI;
@@ -281,6 +283,7 @@
                 frameRate: 8,
                 repeat: -1
             });
+
 
             this.player.play('walk');
             this.cameras.main.startFollow(this.player);
