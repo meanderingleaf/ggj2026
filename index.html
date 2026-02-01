@@ -185,7 +185,7 @@
         ];
         potential_responses =  { 
             "real": "sundial", 
-            "sketchy": "mask", 
+            "sketchy": "guillotine", 
             "hasty": "pillow"
         };
         correct_responses = [ this.potential_responses.sketchy, this.potential_responses.hasty, this.potential_responses.real, this.potential_responses.real ];
@@ -193,7 +193,9 @@
         player_velocity = -1;
         player;
         portraits = [];
-       
+        timer_circle;
+        choice_timeout = 200;//17000;
+        choice_sprites = [];
 
         //pillow, sundial, mask
 
@@ -201,6 +203,10 @@
         {
             this.load.audio('bgm', 'assets/mysteriousweird.mp3');
             this.load.image('bgimage', 'assets/randomBG.png');
+            this.load.image('ico_wavy', 'assets/ico_wavy.png');
+            this.load.image('ico_octo', 'assets/ico_octo.png');
+            this.load.image('ico_tri', 'assets/ico_tri.png');
+
             this.load.spritesheet('brawler', 'assets/brawler48x48.png', { frameWidth: 48, frameHeight: 48 });
             this.load.spritesheet('psprite', 'assets/glitch_sprite.png', { frameWidth: 32, frameHeight: 32 });
             this.load.spritesheet('por_paperdoll', 'assets/paper_doll_portrait.png', { frameWidth: 1024, frameWidth: 1024 });
@@ -229,9 +235,34 @@
                 var audio = new Audio();
                 audio.src = synth.Animalese(this.progress_prompts[this.progress], false, 1).dataURI;
                 audio.play();
+
+                 this.tweens.addCounter({
+                    from: 0,
+                    to: 360,
+                    duration: this.choice_timeout,
+                    onUpdate:  (tween) => {
+                        // graphics.slice stuff
+                        this.timer_circle.clear();
+                        this.timer_circle.beginPath();
+                        this.timer_circle.slice(0,0,45,Phaser.Math.DegToRad(tween.getValue()),Phaser.Math.DegToRad(360))
+                        this.timer_circle.fillPath();
+                        this.timer_circle.strokePath();
+                        // use tween.getValue() to get the progress
+                    },
+                    onComplete: () =>{
+                        //reset game
+                        // this is the biggest copout but Im jammin
+                        //window.location.reload();
+                    }
+                });
                 
                 //wait for next progress
                 this.progress_checking = true;
+            }
+
+            //game over
+            if( this.player.y <5000 ) {
+               // window.close();
             }
 
             if(this.progress_checking) {
@@ -255,6 +286,28 @@
                 }
             }
 
+            //nasty double loop
+
+            this.choice_sprites.forEach( (sprite, index) => {
+                sprite.visible = false;
+            });
+
+            
+            for(let i=0; i<detectionData.length; i++) {
+                let detected_class = detectionData[i].className.toLowerCase();
+                
+                if(detected_class.includes(this.potential_responses.real)) {
+                    this.choice_sprites[0].visible = true;
+                }
+                if(detected_class.includes(this.potential_responses.sketchy)) {
+                     this.choice_sprites[1].visible = true;
+                }
+                if(detected_class.includes(this.potential_responses.hasty)) {
+                     this.choice_sprites[2].visible = true;
+                }
+            }
+
+
             //this.progress++;
         }
 
@@ -268,10 +321,11 @@
            this.player = this.add.sprite(270, 800, 'brawler');
 
             //enconters - small sprites
-            this.add.sprite(200, this.progress_points[0], 'psprite');
-            this.add.sprite(200, this.progress_points[1], 'psprite');
-            this.add.sprite(200, this.progress_points[2], 'psprite');
-            this.add.sprite(200, this.progress_points[3], 'psprite');  
+            var glitches = []
+            glitches[0] = this.add.sprite(200, this.progress_points[0], 'psprite').setScale(2);
+            glitches[1] = this.add.sprite(200, this.progress_points[1], 'psprite').setScale(2);
+            glitches[2] = this.add.sprite(200, this.progress_points[2], 'psprite').setScale(2);
+            glitches[3] = this.add.sprite(200, this.progress_points[3], 'psprite').setScale(2);
 
             //enconters - big sprites
                 //There has to be some way to make a container / loop I am being lazy right now.
@@ -279,14 +333,14 @@
             this.portraits[0].setScrollFactor(0);
             this.portraits[0].visible = false;
             this.portraits[1] = this.add.sprite(150, 600, 'por_cons').setScale(.4);
-             this.portraits[1].setScrollFactor(0);
-             this.portraits[1].visible = false;
+            this.portraits[1].setScrollFactor(0);
+            this.portraits[1].visible = false;
             this.portraits[2] = this.add.sprite(150, 600, 'por_person').setScale(.4);
-             this.portraits[2].setScrollFactor(0);
-             this.portraits[2].visible = false;
+            this.portraits[2].setScrollFactor(0);
+            this.portraits[2].visible = false;
             this.portraits[3] = this.add.sprite(150, 600, 'por_person').setScale(.4);
-             this.portraits[3].setScrollFactor(0);
-             this.portraits[3].visible = false;
+            this.portraits[3].setScrollFactor(0);
+            this.portraits[3].visible = false;
 
            this.anims.create({
                 key: 'walk',
@@ -317,14 +371,44 @@
                 frameRate: 2,
                 repeat: -1
             });
-             this.portraits[1].play('idle_cons');
+            this.portraits[1].play('idle_cons');
 
+            this.anims.create({
+                key: 'guard_idle',
+                frames: this.anims.generateFrameNumbers('psprite', { frames: [ 0, 1, 2 ] }),
+                frameRate: 2,
+                repeat: -1
+            });
+
+            glitches.forEach( (glitch) => {
+                glitch.play('guard_idle');
+            });
 
             this.player.play('walk');
             this.cameras.main.startFollow(this.player);
 
             this.txtDialog = this.add.text(100, 800, '', { fontFamily: 'Arial, sans-serif' });
             this.txtDialog.setScrollFactor(0);
+
+            this.timer_circle = this.add.graphics();
+            this.timer_circle.x = 470;
+            this.timer_circle.y = 70;
+            this.timer_circle.setScrollFactor(0);
+            this.timer_circle.lineStyle(4, 0xff00ff, 1);
+            this.timer_circle.fillStyle(0xFFFFFF, 1);
+
+            //choice sprites
+            this.choice_sprites[0] = this.add.image(350, 900, 'ico_wavy').setScale(0.5);
+            this.choice_sprites[0].setScrollFactor(0);
+            this.choice_sprites[1] = this.add.image(420, 900, 'ico_octo').setScale(0.5);
+            this.choice_sprites[1].setScrollFactor(0);
+            this.choice_sprites[2] = this.add.image(490, 900, 'ico_tri').setScale(0.5);
+            this.choice_sprites[2].setScrollFactor(0);
+        
+
+            // arc (x, y, radius, startAngle, endAngle, anticlockwise)
+            //this.timer_circle.arc(0, 0, 50, Phaser.Math.DegToRad(90), Phaser.Math.DegToRad(180), true);
+
 
             /*
             this.add.image(400, 300, 'sky');
