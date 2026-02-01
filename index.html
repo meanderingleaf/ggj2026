@@ -267,24 +267,34 @@
                // window.close();
             }
 
+            var do_progress = false;
             if(this.progress_checking) {
                 //check detectionData for correct object
                 for(let i=0; i<detectionData.length; i++) {
 
                     let detected_class = detectionData[i].className.toLowerCase();
+
+
                     if(detected_class.includes(this.correct_responses[this.progress])) {
-                        //correct object detected
-                        this.portraits[this.progress].visible = false;
-                        this.progress++;
-                        this.progress_checking = false;
-                       // setTimeout( () => {
-                            this.player_velocity = -1;
-                            this.player.play('walk');
-                            this.txtDialog.setText("");
-                      //  }, 2000);
+                        do_progress = true;
                         break;
                     }
                 }
+
+
+                if(this.QKey.isDown) {
+                    do_progress = true;
+                }
+            }
+
+
+            if(do_progress) {
+                this.portraits[this.progress].visible = false;
+                this.progress++;
+                this.progress_checking = false;
+                this.player_velocity = -1;
+                this.player.play('walk');
+                this.txtDialog.setText("");
             }
 
             //nasty double loop
@@ -308,6 +318,7 @@
                 }
             }
 
+            console.log( this.QKey.isDown );
 
             //this.progress++;
         }
@@ -419,6 +430,9 @@
             this.choice_sprites[2] = this.add.image(490, 900, 'ico_tri').setScale(0.5);
             this.choice_sprites[2].setScrollFactor(0);
         
+
+            this.QKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+
 
             // arc (x, y, radius, startAngle, endAngle, anticlockwise)
             //this.timer_circle.arc(0, 0, 50, Phaser.Math.DegToRad(90), Phaser.Math.DegToRad(180), true);
